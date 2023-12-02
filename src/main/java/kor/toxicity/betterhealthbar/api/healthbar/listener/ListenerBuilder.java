@@ -19,6 +19,7 @@ public class ListenerBuilder {
 
     static {
         add("health", c -> e -> e.getHealth() / Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
+        add("healthbefore", c -> e -> (e.getHealth() + e.getLastDamage()) / Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
     }
 
 

@@ -7,4 +7,6 @@ public interface ConfigManager extends BetterHealthBarManager {
     long getHealthBarRemainTime();
     double getDefaultHealthBarHeight();
     double getFontSize();
+    boolean isShowPlayerHealthBar();
+    boolean isShowMeHealthBar();
 }
