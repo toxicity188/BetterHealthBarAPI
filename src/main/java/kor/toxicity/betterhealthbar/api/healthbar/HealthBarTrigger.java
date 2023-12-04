@@ -2,5 +2,6 @@ package kor.toxicity.betterhealthbar.api.healthbar;
 
 public enum HealthBarTrigger {
     DAMAGE,
-    MOVE
+    MOVE,
+    EMPTY
 }
