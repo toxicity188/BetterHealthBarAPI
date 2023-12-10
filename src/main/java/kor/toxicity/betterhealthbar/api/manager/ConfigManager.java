@@ -13,8 +13,11 @@ public interface ConfigManager extends BetterHealthBarManager {
     long getHealthBarRemainTime();
     double getDefaultHealthBarHeight();
     double getFontSize();
+    double getPlayerLookDistance();
+    double getPlayerLookDegree();
     boolean isShowPlayerHealthBar();
     boolean isShowMeHealthBar();
     boolean isDisableToInvulnerableMob();
+    boolean isUsingTextDisplay();
     @NotNull @Unmodifiable Set<EntityType> getDisableEntityType();
 }

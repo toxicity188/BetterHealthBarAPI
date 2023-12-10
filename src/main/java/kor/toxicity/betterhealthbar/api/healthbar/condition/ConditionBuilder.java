@@ -2,10 +2,14 @@ package kor.toxicity.betterhealthbar.api.healthbar.condition;
 
 import kor.toxicity.betterhealthbar.api.function.EntityCondition;
 import kor.toxicity.betterhealthbar.api.util.FunctionUtil;
+import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -22,9 +26,28 @@ public class ConditionBuilder {
         add("health", c -> {
             var amount = c.getDouble("amount", 1);
             var operation = FunctionUtil.getOperation(c.getString("operation"));
-            return e -> operation.apply(e.getHealth() / Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue(), amount);
+            return h -> {
+                var e = h.getEntity();
+                return operation.apply(e.getHealth() / Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue(), amount);
+            };
         });
-        add("alive", c -> e -> !e.isDead());
+        add("alive", c -> e -> !e.getEntity().isDead());
+        add("type", c -> {
+            var types = EnumSet.copyOf(c.getStringList("types").stream().map(s -> EntityType.valueOf(s.toUpperCase())).toList());
+            return e -> types.contains(e.getEntity().getType());
+        });
+        add("dead", c -> h -> h.getEntity().isDead());
+        add("hasarmor", c -> h -> {
+            var e = h.getEntity();
+            var attribute = e.getAttribute(Attribute.GENERIC_ARMOR);
+            if (attribute != null && attribute.getValue() > 0) return true;
+            var equipment = e.getEquipment();
+            if (equipment == null) return false;
+            return (equipment.getHelmet() != null && equipment.getHelmet().getType() != Material.AIR)
+                    || (equipment.getChestplate() != null && equipment.getChestplate().getType() != Material.AIR)
+                    || (equipment.getLeggings() != null && equipment.getLeggings().getType() != Material.AIR)
+                    || (equipment.getBoots() != null && equipment.getBoots().getType() != Material.AIR);
+        });
     }
 
 

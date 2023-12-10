@@ -2,5 +2,7 @@ package kor.toxicity.betterhealthbar.api.healthbar;
 
 public enum HealthBarType {
     EMPTY,
-    FULL
+    FULL,
+    JOIN,
+    TEXT
 }

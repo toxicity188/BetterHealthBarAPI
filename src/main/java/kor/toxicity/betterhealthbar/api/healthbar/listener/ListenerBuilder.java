@@ -2,12 +2,17 @@ package kor.toxicity.betterhealthbar.api.healthbar.listener;
 
 import kor.toxicity.betterhealthbar.api.function.EntityListener;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 
 public class ListenerBuilder {
@@ -18,8 +23,33 @@ public class ListenerBuilder {
     }
 
     static {
-        add("health", c -> e -> e.getHealth() / Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
-        add("healthbefore", c -> e -> (e.getHealth() + e.getLastDamage()) / Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
+        add("health", c -> h -> {
+            var e = h.getEntity();
+            return e.getHealth() / Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
+        });
+        add("healthbefore", c -> h -> {
+            var e = h.getEntity();
+            return (e.getHealth() + e.getLastDamage()) / Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
+        });
+        add("food", c -> h -> {
+            if (h.getEntity() instanceof HumanEntity entity) {
+                return (double) entity.getFoodLevel() / 20D;
+            } else return 0D;
+        });
+        add("armor", c -> h -> {
+            var d = 0D;
+            var e = h.getEntity();
+            var equipment = e.getEquipment();
+            if (equipment == null) return 0D;
+            var armor = e.getAttribute(Attribute.GENERIC_ARMOR);
+            if (armor != null) d += armor.getValue();
+            d += Optional.ofNullable(equipment.getHelmet()).map(ItemStack::getItemMeta).map(meta -> meta.getAttributeModifiers(Attribute.GENERIC_ARMOR)).map(attribute -> attribute.stream().mapToDouble(AttributeModifier::getAmount).sum()).orElse(0D);
+            d += Optional.ofNullable(equipment.getChestplate()).map(ItemStack::getItemMeta).map(meta -> meta.getAttributeModifiers(Attribute.GENERIC_ARMOR)).map(attribute -> attribute.stream().mapToDouble(AttributeModifier::getAmount).sum()).orElse(0D);
+            d += Optional.ofNullable(equipment.getLeggings()).map(ItemStack::getItemMeta).map(meta -> meta.getAttributeModifiers(Attribute.GENERIC_ARMOR)).map(attribute -> attribute.stream().mapToDouble(AttributeModifier::getAmount).sum()).orElse(0D);
+            d += Optional.ofNullable(equipment.getBoots()).map(ItemStack::getItemMeta).map(meta -> meta.getAttributeModifiers(Attribute.GENERIC_ARMOR)).map(attribute -> attribute.stream().mapToDouble(AttributeModifier::getAmount).sum()).orElse(0D);
+            return d / 20;
+        });
+
     }
 
 
